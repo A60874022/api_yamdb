@@ -7,7 +7,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
     """"Класс ввода/вывода данных в заданном формате для модели Categories"""
     
     class Meta:
-        fields = ('name', 'slug')
+        fields = ('id', 'name', 'slug')
         model = Categories
 
 
@@ -16,12 +16,13 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        fields = ('name', 'slug')
+        fields = ('id', 'name', 'slug')
         model = Genres
 
 
 class TitlesSerializer(serializers.ModelSerializer):
     """Класс ввода/вывода данных в заданном формате для модели Titles"""
+    achievements = AchievementSerializer(many=True, required=False)
     class Meta:
         fields = ('name', 'year', 'description', 'genre', 'category')
         model = Titles
