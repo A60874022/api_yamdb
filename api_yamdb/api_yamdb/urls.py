@@ -20,9 +20,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(
-        path('api/', include('api.urls')),
-        'redoc/',
+    path('api/', include('api.urls')),
+    path('redoc/',
         TemplateView.as_view(template_name='redoc.html'),
         name='redoc'
     ),
