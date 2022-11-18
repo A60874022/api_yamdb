@@ -7,9 +7,9 @@ router = DefaultRouter()
 
 
 router.register('categories', CategoriesViewSet)
-router.register('Genres', GenresViewSet)
-router.register('Titles', TitlesViewSet)
+router.register('genres', GenresViewSet)
+router.register('titles', TitlesViewSet)
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
+    path('', include(router.urls)),
 ]

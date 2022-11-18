@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (IsAuthenticated,
@@ -17,9 +16,7 @@ class CategoriesViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     serializer_class = CategoriesSerializer
     #permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
+    
 
 class GenresViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.DestroyModelMixin, viewsets.GenericViewSet):
@@ -35,11 +32,4 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitlesSerializer
     #permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
-    def get_queryset(self):
-        post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-        return post.comments
-
-    def perform_create(self, serializer):
-        post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-        serializer.save(author=self.request.user, post=post)
-
+    

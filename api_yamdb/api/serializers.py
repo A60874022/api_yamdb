@@ -23,8 +23,8 @@ class GenresSerializer(serializers.ModelSerializer):
 
 class TitlesSerializer(serializers.ModelSerializer):
     """Класс ввода/вывода данных в заданном формате для модели Titles"""
-    genre = serializers.StringRelatedField(many=True, read_only=True)
-    category = serializers.StringRelatedField(many=True, read_only=True)
+    genre = serializers.StringRelatedField()
+    category = serializers.StringRelatedField(many=True)
     class Meta:
         fields = ('name', 'year', 'description', 'genre', 'category')
         model = Titles
