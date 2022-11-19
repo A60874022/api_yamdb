@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from .validate import validate_year
 
 
 class Categories(models.Model):
@@ -19,13 +20,13 @@ class Genres(models.Model):
 class Titles(models.Model):
     """Класс для создания таблицы Title"""
     name =  models.CharField(max_length=256)
-    year = models.IntegerField(blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True, validators=[validate_year])
     description = models.CharField(max_length=256)
     genre = models.ManyToManyField(Genres, through='GenresTitles')
-    category = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True)
+    Categories = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, related_name='Categories')
 
 class GenresTitles(models.Model):
-    Genres = models.ForeignKey(
-        Genres, on_delete=models.CASCADE)
+    Genre = models.ForeignKey(
+        Genres, on_delete=models.CASCADE, related_name='genre')
     Titles = models.ForeignKey(
-        Titles, on_delete=models.CASCADE)
+        Titles, on_delete=models.CASCADE, related_name='titles')
