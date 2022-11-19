@@ -36,4 +36,3 @@ class TitlesViewSet(viewsets.ModelViewSet):
     filterset_fields = ('Categories', 'Genre', 'name', 'year') 
     #permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
-    

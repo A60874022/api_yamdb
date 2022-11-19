@@ -21,5 +21,6 @@ class Command(BaseCommand):
                 for row in csv_reader:
                     try:
                         key.objects.bulk_create(**row)
+                        
                     except Exception as error:
                         print(error, f'{key}')
