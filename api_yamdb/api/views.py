@@ -9,33 +9,33 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import mixins
-from reviews.models import Categories, Genres, Review, Titles, User
+from reviews.models import Category, Genre, Review, Titles, User
 
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAdminModeratorOwnerOrReadOnly)
-from .serializers import (CategoriesSerializer, CommentSerializer,
-                          GenresSerializer, ReadOnlyTitleSerializer,
+from .serializers import (CategorySerializer, CommentSerializer,
+                          Genreerializer, ReadOnlyTitleSerializer,
                           RegisterDataSerializer, ReviewSerializer,
                           TitlesSerializer, TokenSerializer, UserEditSerializer,
                           UserSerializer)
 
 
 
-class CategoriesViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
+class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    """Класс для работы модели Categories для операций CRUD"""
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
+    """Класс для работы модели Category для операций CRUD"""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     pagination_class = PageNumberPagination 
     permission_classes = [IsAdminModeratorOwnerOrReadOnly]
 
     
 
-class GenresViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
+class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    """Класс для работы модели Genres для операций CRUD"""
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializer
+    """Класс для работы модели Genre для операций CRUD"""
+    queryset = Genre.objects.all()
+    serializer_class = Genreerializer
     pagination_class = PageNumberPagination 
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',) 
@@ -47,7 +47,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('Categories', 'Genre', 'name', 'year') 
+    filterset_fields = ('Category', 'Genre', 'name', 'year') 
     permission_classes = [IsAdminModeratorOwnerOrReadOnly]
 
 def get_serializer_class(self):

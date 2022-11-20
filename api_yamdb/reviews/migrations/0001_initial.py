@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Categories',
+            name='Category',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=256)),
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Genres',
+            name='Genre',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=256)),
@@ -64,10 +64,10 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='GenresTitles',
+            name='GenreTitles',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Genres')),
+                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Genre')),
             ],
         ),
         migrations.CreateModel(
@@ -77,8 +77,8 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=256)),
                 ('year', models.IntegerField(blank=True, null=True, validators=[reviews.validate.validate_year])),
                 ('description', models.CharField(max_length=256)),
-                ('Categories', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='Categories', to='reviews.Categories')),
-                ('genre', models.ManyToManyField(through='reviews.GenresTitles', to='reviews.Genres')),
+                ('Category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='Category', to='Category'))
+                ('genre', models.ManyToManyField(through='reviews.GenreTitles', to='reviews.Genre')),
             ],
         ),
         migrations.CreateModel(
@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddField(
-            model_name='genrestitles',
+            model_name='Genretitles',
             name='title',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Titles'),
         ),

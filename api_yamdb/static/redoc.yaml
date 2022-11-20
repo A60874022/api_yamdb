@@ -28,9 +28,9 @@ servers:
 tags:
   - name: AUTH
     description: Регистрация пользователей и выдача токенов
-  - name: CATEGORIES
+  - name: Category
     description: Категории (типы) произведений
-  - name: GENRES
+  - name: Genre
     description: Категории жанров
   - name: TITLES
     description: Произведения, к которым пишут отзывы (определённый фильм, книга или песенка).
@@ -126,10 +126,10 @@ paths:
         404:
           description: Пользователь не найден
 
-  /categories/:
+  /Category/:
     get:
       tags:
-        - CATEGORIES
+        - Category
       operationId: Получение списка всех категорий
       description: |
         Получить список всех категорий
@@ -163,7 +163,7 @@ paths:
                         $ref: '#/components/schemas/Category'
     post:
       tags:
-        - CATEGORIES
+        - Category
       operationId: Добавление новой категории
       description: |
         Создать категорию.
@@ -196,10 +196,10 @@ paths:
       security:
       - jwt-token:
         - write:admin
-  /categories/{slug}/:
+  /Category/{slug}/:
     delete:
       tags:
-        - CATEGORIES
+        - Category
       operationId: Удаление категории
       description: |
         Удалить категорию.
@@ -225,10 +225,10 @@ paths:
       - jwt-token:
         - write:admin
 
-  /genres/:
+  /Genre/:
     get:
       tags:
-        - GENRES
+        - Genre
       operationId: Получение списка всех жанров
       description: |
         Получить список всех жанров.
@@ -262,7 +262,7 @@ paths:
                         $ref: '#/components/schemas/Genre'
     post:
       tags:
-        - GENRES
+        - Genre
       operationId: Добавление жанра
       description: |
         Добавить жанр.
@@ -291,10 +291,10 @@ paths:
       - jwt-token:
         - write:admin
 
-  /genres/{slug}/:
+  /Genre/{slug}/:
     delete:
       tags:
-        - GENRES
+        - Genre
       operationId: Удаление жанра
       description: |
         Удалить жанр.

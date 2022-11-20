@@ -3,24 +3,24 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.relations import SlugRelatedField
 from django.db.models import Avg
 
-from reviews.models import Categories, Genres, Titles, Comment, Review, Titles, User
+from reviews.models import Category, Genre, Titles, Comment, Review, Titles, User
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
-    """"Класс ввода/вывода данных в заданном формате для модели Categories"""
+class CategorySerializer(serializers.ModelSerializer):
+    """"Класс ввода/вывода данных в заданном формате для модели Category"""
    
     class Meta:
         fields = ('id', 'name', 'slug')
-        model = Categories
+        model = Category
 
 
-class GenresSerializer(serializers.ModelSerializer):
-    """Класс ввода/вывода данных в заданном формате для модели Genres"""
+class Genreerializer(serializers.ModelSerializer):
+    """Класс ввода/вывода данных в заданном формате для модели Genre"""
 
 
     class Meta:
         fields = ('id', 'name', 'slug')
-        model = Genres
+        model = Genre
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -42,10 +42,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 class TitlesSerializer(serializers.ModelSerializer):
     """Класс ввода/вывода данных в заданном формате для модели Titles"""
     genre = serializers.SlugRelatedField(
-        slug_field='slug', many=True, queryset=Genres.objects.all()
+        slug_field='slug', many=True, queryset=Genre.objects.all()
     )
     category = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Categories.objects.all())
+        slug_field='slug', queryset=Category.objects.all())
        
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
@@ -54,8 +54,8 @@ class TitlesSerializer(serializers.ModelSerializer):
 
 class ReadOnlyTitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
-    genre = GenresSerializer(many=True)
-    category = CategoriesSerializer()
+    genre = Genreerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
         model = Titles
