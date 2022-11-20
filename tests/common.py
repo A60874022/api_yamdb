@@ -31,17 +31,17 @@ def auth_client(user):
     return client
 
 
-def create_Category(admin_client):
+def create_categories(admin_client):
     data1 = {
         'name': 'Фильм',
         'slug': 'films'
     }
-    admin_client.post('/api/v1/Category/', data=data1)
+    admin_client.post('/api/v1/categories/', data=data1)
     data2 = {
         'name': 'Книги',
         'slug': 'books'
     }
-    admin_client.post('/api/v1/Category/', data=data2)
+    admin_client.post('/api/v1/categories/', data=data2)
     return [data1, data2]
 
 
@@ -49,31 +49,31 @@ def create_genre(admin_client):
     result = []
     data = {'name': 'Ужасы', 'slug': 'horror'}
     result.append(data)
-    admin_client.post('/api/v1/Genre/', data=data)
+    admin_client.post('/api/v1/genres/', data=data)
     data = {'name': 'Комедия', 'slug': 'comedy'}
     result.append(data)
-    admin_client.post('/api/v1/Genre/', data=data)
+    admin_client.post('/api/v1/genres/', data=data)
     data = {'name': 'Драма', 'slug': 'drama'}
     result.append(data)
-    admin_client.post('/api/v1/Genre/', data=data)
+    admin_client.post('/api/v1/genres/', data=data)
     return result
 
 
 def create_titles(admin_client):
-    Genre = create_genre(admin_client)
-    Category = create_Category(admin_client)
+    genres = create_genre(admin_client)
+    categories = create_categories(admin_client)
     result = []
-    data = {'name': 'Поворот туда', 'year': 2000, 'genre': [Genre[0]['slug'], Genre[1]['slug']],
-            'category': Category[0]['slug'], 'description': 'Крутое пике'}
+    data = {'name': 'Поворот туда', 'year': 2000, 'genre': [genres[0]['slug'], genres[1]['slug']],
+            'category': categories[0]['slug'], 'description': 'Крутое пике'}
     response = admin_client.post('/api/v1/titles/', data=data)
     data['id'] = response.json()['id']
     result.append(data)
-    data = {'name': 'Проект', 'year': 2020, 'genre': [Genre[2]['slug']], 'category': Category[1]['slug'],
+    data = {'name': 'Проект', 'year': 2020, 'genre': [genres[2]['slug']], 'category': categories[1]['slug'],
             'description': 'Главная драма года'}
     response = admin_client.post('/api/v1/titles/', data=data)
     data['id'] = response.json()['id']
     result.append(data)
-    return result, Category, Genre
+    return result, categories, genres
 
 
 def create_reviews(admin_client, admin):

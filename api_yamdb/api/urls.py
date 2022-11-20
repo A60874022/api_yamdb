@@ -6,8 +6,8 @@ from .views import CategoryViewSet, GenreViewSet, TitlesViewSet, CommentViewSet,
 router = DefaultRouter()
 
 
-router.register('category', CategoryViewSet)
-router.register('genre', GenreViewSet)
+router.register('categories', CategoryViewSet)
+router.register('genres', GenreViewSet)
 router.register('titles', TitlesViewSet)
 router.register(r'titles/(?P<title_id>\d+)/reviews',
                 ReviewViewSet, basename='reviews')

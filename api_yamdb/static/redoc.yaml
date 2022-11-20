@@ -30,7 +30,7 @@ tags:
     description: Регистрация пользователей и выдача токенов
   - name: Category
     description: Категории (типы) произведений
-  - name: Genre
+  - name: GENRES
     description: Категории жанров
   - name: TITLES
     description: Произведения, к которым пишут отзывы (определённый фильм, книга или песенка).
@@ -225,10 +225,10 @@ paths:
       - jwt-token:
         - write:admin
 
-  /Genre/:
+  /genres/:
     get:
       tags:
-        - Genre
+        - GENRES
       operationId: Получение списка всех жанров
       description: |
         Получить список всех жанров.
@@ -262,7 +262,7 @@ paths:
                         $ref: '#/components/schemas/Genre'
     post:
       tags:
-        - Genre
+        - GENRES
       operationId: Добавление жанра
       description: |
         Добавить жанр.
@@ -291,10 +291,10 @@ paths:
       - jwt-token:
         - write:admin
 
-  /Genre/{slug}/:
+  /genres/{slug}/:
     delete:
       tags:
-        - Genre
+        - GENRES
       operationId: Удаление жанра
       description: |
         Удалить жанр.

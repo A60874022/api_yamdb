@@ -1,9 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from rest_framework.relations import SlugRelatedField
-from django.db.models import Avg
 
-from reviews.models import Category, Genre, Titles, Comment, Review, Titles, User
+from reviews.models import Category, Genre, Titles, Comment, Review,  User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -14,7 +13,7 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
 
 
-class Genreerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     """Класс ввода/вывода данных в заданном формате для модели Genre"""
 
 
@@ -54,7 +53,7 @@ class TitlesSerializer(serializers.ModelSerializer):
 
 class ReadOnlyTitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
-    genre = Genreerializer(many=True)
+    genre = GenreSerializer(many=True)
     category = CategorySerializer()
 
     class Meta:

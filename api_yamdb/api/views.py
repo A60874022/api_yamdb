@@ -9,12 +9,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import mixins
-from reviews.models import Category, Genre, Review, Titles, User
 
+
+from reviews.models import Category, Genre, Review, Titles, User
+from .filters import TitlesFilter
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
-                          IsAdminModeratorOwnerOrReadOnly)
+                          IsAdminModeratorOwnerOrReadOnly, IsAdminOrReadOnly2)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          Genreerializer, ReadOnlyTitleSerializer,
+                          GenreSerializer, ReadOnlyTitleSerializer,
                           RegisterDataSerializer, ReviewSerializer,
                           TitlesSerializer, TokenSerializer, UserEditSerializer,
                           UserSerializer)
@@ -26,29 +28,36 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Класс для работы модели Category для операций CRUD"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = PageNumberPagination 
-    permission_classes = [IsAdminModeratorOwnerOrReadOnly]
-
+    
+    permission_classes = [IsAdminOrReadOnly2]
+    filter_backends = [filters.SearchFilter]
+    lookup_field = 'slug'
+    search_fields = ('name',)
     
 
 class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.DestroyModelMixin, viewsets.GenericViewSet):
     """Класс для работы модели Genre для операций CRUD"""
     queryset = Genre.objects.all()
-    serializer_class = Genreerializer
-    pagination_class = PageNumberPagination 
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',) 
-    permission_classes = [IsAdminModeratorOwnerOrReadOnly]
+    serializer_class = GenreSerializer
+    filter_backends = [filters.SearchFilter]
+    lookup_field = 'slug'
+    search_fields = ('name',)
+    permission_classes =  [IsAdminOrReadOnly2]
 
-
-class TitlesViewSet(viewsets.ModelViewSet):
-    """Класс для работы модели Titles для операций CRUD"""
-    queryset = Titles.objects.all()
+class TitlesViewSet(viewsets.ModelViewSet): 
+    queryset = Titles.objects.all().annotate(
+        Avg("reviews__score")
+    ).order_by("name")
     serializer_class = TitlesSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('Category', 'Genre', 'name', 'year') 
-    permission_classes = [IsAdminModeratorOwnerOrReadOnly]
+    permission_classes =  [IsAdminOrReadOnly2]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitlesFilter
+
+    def get_serializer_class(self):
+        if self.action in ("retrieve", "list"):
+            return ReadOnlyTitleSerializer
+        return TitlesSerializer
 
 def get_serializer_class(self):
         if self.action in ("retrieve", "list"):
