@@ -3,8 +3,8 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.relations import SlugRelatedField
 from django.db.models import Avg
 
-from reviews.models import Categories, Genres, Titles, Comment, Review, Titles
-from reviews.models import User
+from reviews.models import Categories, Genres, Titles, Comment, Review, Titles, User
+
 
 class CategoriesSerializer(serializers.ModelSerializer):
     """"Класс ввода/вывода данных в заданном формате для модели Categories"""
@@ -41,8 +41,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class TitlesSerializer(serializers.ModelSerializer):
     """Класс ввода/вывода данных в заданном формате для модели Titles"""
-    Genre = serializers.StringRelatedField()
-    Categories = serializers.StringRelatedField(many=True)
+    genre = serializers.StringRelatedField()
+    category = serializers.StringRelatedField(many=True)
     rating = serializers.SerializerMethodField()
   
        
@@ -57,22 +57,69 @@ class TitlesSerializer(serializers.ModelSerializer):
         except TypeError:
             return None
 
-class RegistrationSerializer(serializers.ModelSerializer):
+class ReadOnlyTitleSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(
+        source='reviews__score__avg', read_only=True
+    )
+    genre = GenresSerializer(many=True)
+    category = CategoriesSerializer
+
+    class Meta:
+        model = Titles
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        )
+
+
+class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ],
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
     )
     email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+
+    class Meta:
+        fields = ("username", "email", "first_name",
+                  "last_name", "bio", "role")
+        model = User
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("username", "email", "first_name",
+                  "last_name", "bio", "role")
+        model = User
+        read_only_fields = ('role',)
+
+
+class RegisterDataSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
     )
 
     def validate_username(self, value):
-        username = value.lower()
-        if username == "me":
-            raise serializers.ValidationError("Имя me недоступно")
+        if value.lower() == "me":
+            raise serializers.ValidationError("Username 'me' is not valid")
         return value
 
     class Meta:
+        fields = ("username", "email")
         model = User
-        fields = ('username', 'email')
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
