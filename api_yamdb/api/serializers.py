@@ -4,7 +4,7 @@ from rest_framework.relations import SlugRelatedField
 from django.db.models import Avg
 
 from reviews.models import Categories, Genres, Titles, Comment, Review, Titles
-from .models import User
+from reviews.models import User
 
 class CategoriesSerializer(serializers.ModelSerializer):
     """"Класс ввода/вывода данных в заданном формате для модели Categories"""

@@ -1,9 +1,30 @@
-from django.contrib.auth import get_user_model
 from django.db import models
-
 from .validate import validate_year
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class User(AbstractUser):
+    """"Выбор роли для пользователя"""
+    CHOICES = (
+        ('A', 'Админ'),
+        ('M', 'Модер'),
+        ('U', 'Подтвержденный пользователь'),
+    )
+    bio = models.TextField(
+        'Биография',
+        blank=True,
+    )
+    role = models.CharField(
+        'Роль',
+        choices=CHOICES,
+        max_length=30,
+        default='U'
+    )
+
+    def __str__(self):
+        return self.username
 class Categories(models.Model):
     """Класс для создания таблицы Categories"""
     name = models.CharField(max_length=256)
@@ -27,15 +48,12 @@ class Titles(models.Model):
 
 
 class GenresTitles(models.Model):
-    name = models.CharField(max_length=256)
-    year = models.IntegerField(blank=True, null=True)
-    description = models.CharField(max_length=256)
-    genre = models.ManyToManyField(Genres, through='GenresTitles')
-    category = models.OneToOneField(Categories, through='CategoriesTitles')
-    rating = models.IntegerField(null=True, default=None)
-
-    def __str__(self):
-        return self.name
+    title = models.ForeignKey(
+        Titles,
+        on_delete=models.CASCADE)
+    genre = models.ForeignKey(
+        Genres,
+        on_delete=models.CASCADE)
 
 
 class Review(models.Model):
