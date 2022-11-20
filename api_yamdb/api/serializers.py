@@ -1,9 +1,10 @@
 from rest_framework import serializers
-
+from rest_framework.validators import UniqueValidator
 from rest_framework.relations import SlugRelatedField
 from django.db.models import Avg
-from reviews.models import Categories, Genres, Titles, Comment, Review, Titles
 
+from reviews.models import Categories, Genres, Titles, Comment, Review, Titles
+from .models import User
 
 class CategoriesSerializer(serializers.ModelSerializer):
     """"Класс ввода/вывода данных в заданном формате для модели Categories"""
@@ -55,3 +56,23 @@ class TitlesSerializer(serializers.ModelSerializer):
             return rating.get('score__avg')
         except TypeError:
             return None
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
+    def validate_username(self, value):
+        username = value.lower()
+        if username == "me":
+            raise serializers.ValidationError("Имя me недоступно")
+        return value
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
