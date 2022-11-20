@@ -5,9 +5,9 @@ from django.db import models
 class User(AbstractUser):
     """"Выбор роли для пользователя"""
     CHOICES = (
-        ('A', 'Админ'),
-        ('M', 'Модер'),
-        ('U', 'Подтвержденный пользователь'),
+        ('admin', 'Админ'),
+        ('moderator', 'Модер'),
+        ('user', 'Подтвержденный пользователь'),
     )
     bio = models.TextField(
         'Биография',
@@ -18,6 +18,10 @@ class User(AbstractUser):
         choices=CHOICES,
         max_length=30,
         default='U'
+    )
+    confirmation_code = models.CharField(
+        blank=True,
+        max_length=150
     )
 
     def __str__(self):
