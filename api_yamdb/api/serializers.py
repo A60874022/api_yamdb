@@ -41,28 +41,21 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class TitlesSerializer(serializers.ModelSerializer):
     """Класс ввода/вывода данных в заданном формате для модели Titles"""
-    genre = serializers.StringRelatedField()
-    category = serializers.StringRelatedField(many=True)
-    rating = serializers.SerializerMethodField()
-  
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', many=True, queryset=Genres.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Categories.objects.all())
        
     class Meta:
-        fields = ('name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category', 'rating')
         model = Titles
 
-    def get_rating(self, obj):
-        try:
-            rating = obj.reviews.aggregate(Avg('score'))
-            return rating.get('score__avg')
-        except TypeError:
-            return None
 
 class ReadOnlyTitleSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField(
-        source='reviews__score__avg', read_only=True
-    )
+    rating = serializers.SerializerMethodField()
     genre = GenresSerializer(many=True)
-    category = CategoriesSerializer
+    category = CategoriesSerializer()
 
     class Meta:
         model = Titles

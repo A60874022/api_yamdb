@@ -26,7 +26,7 @@ class CategoriesViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Класс для работы модели Categories для операций CRUD"""
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-   
+    pagination_class = PageNumberPagination 
     permission_classes = [IsAdminModeratorOwnerOrReadOnly]
 
     
@@ -36,7 +36,7 @@ class GenresViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Класс для работы модели Genres для операций CRUD"""
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
- 
+    pagination_class = PageNumberPagination 
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',) 
     permission_classes = [IsAdminModeratorOwnerOrReadOnly]
@@ -49,6 +49,11 @@ class TitlesViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('Categories', 'Genre', 'name', 'year') 
     permission_classes = [IsAdminModeratorOwnerOrReadOnly]
+
+def get_serializer_class(self):
+        if self.action in ("retrieve", "list"):
+            return ReadOnlyTitleSerializer
+        return TitlesSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
