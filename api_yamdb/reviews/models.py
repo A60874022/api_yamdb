@@ -5,13 +5,15 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+""""Выбор роли для пользователя"""
+CHOICES = (
+    ('admin', 'Админ'),
+    ('moderator', 'Модер'),
+    ('user', 'Подтвержденный пользователь'),
+)
+
+
 class User(AbstractUser):
-    """"Выбор роли для пользователя"""
-    CHOICES = (
-        ('A', 'Админ'),
-        ('M', 'Модер'),
-        ('U', 'Подтвержденный пользователь'),
-    )
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -20,11 +22,16 @@ class User(AbstractUser):
         'Роль',
         choices=CHOICES,
         max_length=30,
-        default='U'
+        default='user'
+    )
+    confirmation_code = models.CharField(
+        blank=True,
+        max_length=150
     )
 
     def __str__(self):
         return self.username
+
         
 class Category(models.Model):
     """Класс для создания таблицы Category"""
