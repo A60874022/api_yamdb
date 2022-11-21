@@ -28,12 +28,11 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Класс для работы модели Category для операций CRUD"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    
     permission_classes = [IsAdminOrReadOnly2]
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
-    
+    pagination_class = PageNumberPagination 
 
 class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.DestroyModelMixin, viewsets.GenericViewSet):
@@ -44,6 +43,7 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     lookup_field = 'slug'
     search_fields = ('name',)
     permission_classes =  [IsAdminOrReadOnly2]
+    pagination_class = PageNumberPagination
 
 class TitlesViewSet(viewsets.ModelViewSet): 
     queryset = Titles.objects.all().annotate(
@@ -53,6 +53,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     permission_classes =  [IsAdminOrReadOnly2]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitlesFilter
+    pagination_class = PageNumberPagination 
 
     def get_serializer_class(self):
         if self.action in ("retrieve", "list"):

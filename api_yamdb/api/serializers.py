@@ -9,7 +9,7 @@ class CategorySerializer(serializers.ModelSerializer):
     """"Класс ввода/вывода данных в заданном формате для модели Category"""
    
     class Meta:
-        fields = ('id', 'name', 'slug')
+        fields = ('name', 'slug')
         model = Category
 
 
@@ -18,7 +18,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        fields = ('id', 'name', 'slug')
+        fields = ('name', 'slug')
         model = Genre
 
 
@@ -27,7 +27,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ('text', 'author', 'pub_date')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
