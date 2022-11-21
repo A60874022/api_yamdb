@@ -1,14 +1,15 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+""""Выбор роли для пользователя"""
+CHOICES = (
+    ('admin', 'Админ'),
+    ('moderator', 'Модер'),
+    ('user', 'Подтвержденный пользователь'),
+)
+
 
 class User(AbstractUser):
-    """"Выбор роли для пользователя"""
-    CHOICES = (
-        ('admin', 'Админ'),
-        ('moderator', 'Модер'),
-        ('user', 'Подтвержденный пользователь'),
-    )
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -17,7 +18,7 @@ class User(AbstractUser):
         'Роль',
         choices=CHOICES,
         max_length=30,
-        default='U'
+        default='user'
     )
     confirmation_code = models.CharField(
         blank=True,

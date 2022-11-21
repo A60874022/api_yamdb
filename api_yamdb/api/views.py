@@ -1,16 +1,18 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework import filters
 from reviews.models import User
-from .serializers import (RegistrationSerializer, TokenSerializer,
-                          UsersSerializer, AdminUsersSerializer)
-from rest_framework import generics
-from rest_framework.decorators import action
+
+from .permissions import IsAdminOrSuperUser
+from .serializers import (AdminUsersSerializer, RegistrationSerializer,
+                          TokenSerializer, UsersChangeSerializer,
+                          UsersSerializer)
 
 
 class RegistrationViewSet(APIView):
@@ -57,11 +59,14 @@ class TokenViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AdminUserView(generics.ListCreateAPIView):
+class AdminUserView(viewsets.ModelViewSet):
+    lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = AdminUsersSerializer
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+    permission_classes = (IsAdminOrSuperUser,)
 
     def post(self, request):
         serializer = AdminUsersSerializer(data=request.data)
@@ -74,6 +79,7 @@ class AdminUserView(generics.ListCreateAPIView):
 class UserView(APIView):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
 
     @action(detail=False, methods=['get', 'patch'], url_path='me')
     def get(self, request):
@@ -84,7 +90,7 @@ class UserView(APIView):
 
     def patch(self, request):
         if request.method == 'PATCH':
-            serializer = UsersSerializer(
+            serializer = UsersChangeSerializer(
                 request.user,
                 request.data,
                 partial=True

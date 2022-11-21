@@ -72,4 +72,26 @@ class UsersSerializer(serializers.ModelSerializer):
                   'email',
                   'bio',
                   'first_name',
-                  'last_name',)
+                  'last_name',
+                  'role')
+
+
+class UsersChangeSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
+    class Meta:
+        model = User
+        fields = ('username',
+                  'email',
+                  'bio',
+                  'first_name',
+                  'last_name',
+                  'role')
+        read_only_fields = ('role',)
