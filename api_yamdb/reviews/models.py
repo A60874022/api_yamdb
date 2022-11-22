@@ -32,28 +32,31 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-        
+
 class Category(models.Model):
     """Класс для создания таблицы Category"""
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
- 
+
 
 class Genre(models.Model):
     """Класс для создания таблицы Genre"""
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
- 
 
 
 class Titles(models.Model):
     """Класс для создания таблицы Title"""
-    name =  models.CharField(max_length=256)
-    year = models.IntegerField(blank=True, null=True, validators=[validate_year])
+    name = models.CharField(max_length=256)
+    year = models.IntegerField(blank=True,
+                               null=True,
+                               validators=[validate_year])
     description = models.CharField(max_length=256)
     genre = models.ManyToManyField(Genre, through='GenreTitles')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='Category')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
+                                 null=True, related_name='Category')
     rating = models.IntegerField(null=True)
+
 
 class GenreTitles(models.Model):
     title = models.ForeignKey(

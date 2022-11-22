@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
 
 from api.views import (RegistrationViewSet, TokenViewSet,
                        UserView)

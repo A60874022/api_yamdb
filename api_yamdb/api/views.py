@@ -12,60 +12,65 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Titles, User
 
 from .filters import TitlesFilter
-from .permissions import (IsAdminOrSuperUser, IsAdminOrReadOnly2)
+from .permissions import (IsAdminOrSuperUser, GTC, AOM)
 from .serializers import (AdminUsersSerializer, CategorySerializer,
                           CommentSerializer, GenreSerializer,
-                          ReadOnlyTitleSerializer, 
+                          ReadOnlyTitleSerializer,
                           RegistrationSerializer, ReviewSerializer,
                           TitlesSerializer, TokenSerializer,
-                           UsersChangeSerializer, UsersSerializer)
+                          UsersChangeSerializer, UsersSerializer)
 
 
 class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
-                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
+                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
     """Класс для работы модели Category для операций CRUD"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminOrReadOnly2]
+    permission_classes = [GTC, ]
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
-    pagination_class = PageNumberPagination 
+    pagination_class = PageNumberPagination
+
 
 class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
-                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
+                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
     """Класс для работы модели Genre для операций CRUD"""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
-    permission_classes =  [IsAdminOrReadOnly2]
+    permission_classes = [GTC, ]
     pagination_class = PageNumberPagination
 
-class TitlesViewSet(viewsets.ModelViewSet): 
+
+class TitlesViewSet(viewsets.ModelViewSet):
+    """Класс для работы модели Titile для операций CRUD"""
     queryset = Titles.objects.all().annotate(
         Avg("reviews__score")
     ).order_by("name")
     serializer_class = TitlesSerializer
-    permission_classes =  [IsAdminOrReadOnly2]
+    permission_classes = [GTC, ]
     filterset_class = TitlesFilter
-    pagination_class = PageNumberPagination 
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         if self.action in ("retrieve", "list"):
             return ReadOnlyTitleSerializer
         return TitlesSerializer
 
+
 def get_serializer_class(self):
-        if self.action in ("retrieve", "list"):
-            return ReadOnlyTitleSerializer
-        return TitlesSerializer
+    if self.action in ("retrieve", "list"):
+        return ReadOnlyTitleSerializer
+    return TitlesSerializer
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Класс для работы модели Review для операций CRUD"""
     serializer_class = ReviewSerializer
-
-
+    permission_classes = [AOM, ]
 
     def get_queryset(self):
         title = get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
@@ -79,7 +84,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Класс для работы модели Comment для операций CRUD"""
     serializer_class = CommentSerializer
+    permission_classes = [AOM, ]
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
@@ -91,7 +98,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
 
+
 class RegistrationViewSet(APIView):
+    """Класс для работы модели User для регистрации"""
     permission_classes = (permissions.AllowAny,)
 
     def confirmation_code(self, username):
@@ -119,6 +128,7 @@ class RegistrationViewSet(APIView):
 
 
 class TokenViewSet(APIView):
+    """Класс для работы модели User для получения токена"""
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -136,6 +146,7 @@ class TokenViewSet(APIView):
 
 
 class AdminUserView(viewsets.ModelViewSet):
+    """Класс для админки"""
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = AdminUsersSerializer
@@ -153,6 +164,7 @@ class AdminUserView(viewsets.ModelViewSet):
 
 
 class UserView(APIView):
+    """Класс для настройки пользователей"""
     queryset = User.objects.all()
     serializer_class = UsersSerializer
     permission_classes = [permissions.IsAuthenticated, ]
