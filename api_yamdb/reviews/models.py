@@ -5,61 +5,22 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-class User(AbstractUser):
-    """"Выбор роли для пользователя"""
-    CHOICES = (
-        ('A', 'Админ'),
-        ('M', 'Модер'),
-        ('U', 'Подтвержденный пользователь'),
-    )
-    bio = models.TextField(
-        'Биография',
-        blank=True,
-    )
-    role = models.CharField(
-        'Роль',
-        choices=CHOICES,
-        max_length=30,
-        default='U'
-    )
 
-    def __str__(self):
-        return self.username
-        
-class Category(models.Model):
-    """Класс для создания таблицы Category"""
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
- 
-
-class Genre(models.Model):
-    """Класс для создания таблицы Genre"""
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
- 
-
-
-class Titles(models.Model):
+class Title(models.Model):
     """Класс для создания таблицы Title"""
-    name =  models.CharField(max_length=256)
-    year = models.IntegerField(blank=True, null=True, validators=[validate_year])
+    name = models.CharField(max_length=256)
+    year = models.IntegerField(blank=True, null=True,
+                               validators=[validate_year])
     description = models.CharField(max_length=256)
     genre = models.ManyToManyField(Genre, through='GenreTitles')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='Category')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
+                                 null=True, related_name='Category')
     rating = models.IntegerField(null=True)
-
-class GenreTitles(models.Model):
-    title = models.ForeignKey(
-        Titles,
-        on_delete=models.CASCADE)
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.CASCADE)
 
 
 class Review(models.Model):
     """Класс для создания отзыва на произведение"""
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE,
+    title = models.ForeignKey(Title, on_delete=models.CASCADE,
                               related_name='reviews')
     text = models.TextField(verbose_name='Отзыв', help_text='Напишите отзыв')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
