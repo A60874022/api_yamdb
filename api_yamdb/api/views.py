@@ -49,11 +49,8 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     pagination_class = PageNumberPagination
 
 
-
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(
-        Avg("reviews__score")
-    ).order_by("name")
+    queryset = Title.objects.all()
     serializer_class = Titleerializer
     permission_classes = [GTC]
     filter_backends = [DjangoFilterBackend]
@@ -64,12 +61,11 @@ class TitleViewSet(viewsets.ModelViewSet):
             return ReadOnlyTitleerializer
         return Titleerializer
 
+    def get_serializer_class(self):
+        if self.action in ("retrieve", "list"):
+            return ReadOnlyTitleerializer
+        return Titleerializer
 
-def get_serializer_class(self):
-    if self.action in ("retrieve", "list"):
-        return ReadOnlyTitleerializer
-    return Titleerializer
-    
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Класс для работы модели Review для операций CRUD"""
