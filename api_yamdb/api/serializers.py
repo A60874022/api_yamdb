@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Category, Genre, Titles, Comment, Review, User
+from reviews.models import Category, Genre, Title, Comment, Review, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -37,8 +37,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'score', 'pub_date')
 
 
-class TitlesSerializer(serializers.ModelSerializer):
-    """Класс ввода/вывода данных в заданном формате для модели Titles"""
+class Titleerializer(serializers.ModelSerializer):
+    """Класс ввода/вывода данных в заданном формате для модели Title"""
     genre = serializers.SlugRelatedField(
         slug_field='slug', many=True, queryset=Genre.objects.all()
     )
@@ -48,16 +48,16 @@ class TitlesSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'year', 'description',
                   'genre', 'category', 'rating')
-        model = Titles
+        model = Title
 
 
-class ReadOnlyTitleSerializer(serializers.ModelSerializer):
+class ReadOnlyTitleerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
 
     class Meta:
-        model = Titles
+        model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )

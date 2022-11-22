@@ -45,11 +45,10 @@ class Genre(models.Model):
     slug = models.SlugField(unique=True)
 
 
-class Titles(models.Model):
+class Title(models.Model):
     """Класс для создания таблицы Title"""
     name = models.CharField(max_length=256)
-    year = models.IntegerField(blank=True,
-                               null=True,
+    year = models.IntegerField(blank=True, null=True,
                                validators=[validate_year])
     description = models.CharField(max_length=256)
     genre = models.ManyToManyField(Genre, through='GenreTitles')
@@ -60,7 +59,7 @@ class Titles(models.Model):
 
 class GenreTitles(models.Model):
     title = models.ForeignKey(
-        Titles,
+        Title,
         on_delete=models.CASCADE)
     genre = models.ForeignKey(
         Genre,
@@ -69,7 +68,7 @@ class GenreTitles(models.Model):
 
 class Review(models.Model):
     """Класс для создания отзыва на произведение"""
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE,
+    title = models.ForeignKey(Title, on_delete=models.CASCADE,
                               related_name='reviews')
     text = models.TextField(verbose_name='Отзыв', help_text='Напишите отзыв')
     author = models.ForeignKey(User, on_delete=models.CASCADE)

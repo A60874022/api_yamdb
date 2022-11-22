@@ -1,5 +1,3 @@
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, permissions, status, viewsets
@@ -9,15 +7,21 @@ from rest_framework.pagination import (LimitOffsetPagination,
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Review, Titles, User
+from reviews.models import Category, Genre, Review, Title, User
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets
+from api.pagination import Pagination
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from api.pagination import Pagination
 
-from .filters import TitlesFilter
+from .filters import TitleFilter
 from .permissions import (IsAdminOrSuperUser, GTC, AOM)
 from .serializers import (AdminUsersSerializer, CategorySerializer,
                           CommentSerializer, GenreSerializer,
-                          ReadOnlyTitleSerializer,
+                          ReadOnlyTitleerializer,
                           RegistrationSerializer, ReviewSerializer,
-                          TitlesSerializer, TokenSerializer,
+                          Titleerializer, TokenSerializer,
                           UsersChangeSerializer, UsersSerializer)
 
 
@@ -45,41 +49,41 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     pagination_class = PageNumberPagination
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
-    """Класс для работы модели Titile для операций CRUD"""
-    queryset = Titles.objects.all().annotate(
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all().annotate(
         Avg("reviews__score")
     ).order_by("name")
-    serializer_class = TitlesSerializer
-    permission_classes = [GTC, ]
-    filterset_class = TitlesFilter
-    pagination_class = PageNumberPagination
+    serializer_class = Titleerializer
+    permission_classes = [GTC]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ("retrieve", "list"):
-            return ReadOnlyTitleSerializer
-        return TitlesSerializer
+            return ReadOnlyTitleerializer
+        return Titleerializer
 
 
 def get_serializer_class(self):
     if self.action in ("retrieve", "list"):
-        return ReadOnlyTitleSerializer
-    return TitlesSerializer
-
+        return ReadOnlyTitleerializer
+    return Titleerializer
+    
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Класс для работы модели Review для операций CRUD"""
     serializer_class = ReviewSerializer
     permission_classes = [AOM, ]
+    pagination_class = Pagination
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
-
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
         return title.reviews.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, id=title_id)
+        title = get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user, title=title)
 
 

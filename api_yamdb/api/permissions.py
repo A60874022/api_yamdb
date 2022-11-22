@@ -48,10 +48,10 @@ class AOM(permissions.BasePermission):
                 or request.user.role == 'moderator'
                 or request.user.role == 'admin')
 
+class AOM(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated)
-
+        return request.method in permissions.SAFE_METHODS or (
+            request.user.is_authenticated)
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -64,3 +64,11 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
             return True
 
         return obj.author == request.user
+    def has_object_permission(self, request, view, obj):
+
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return obj.author == request.user or (
+            request.user.role == 'admin',
+            request.user.role == 'moderator')
