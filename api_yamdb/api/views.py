@@ -8,7 +8,7 @@ from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.pagination import Pagination
 from reviews.models import Category, Genre, Review, Title, User
@@ -136,7 +136,7 @@ class TokenViewSet(APIView):
         )
         confirmation_code = serializer.validated_data['confirmation_code']
         if default_token_generator.check_token(user, confirmation_code):
-            access = AccessToken.for_user(user)
+            access = RefreshToken.for_user(user)
             return Response(f'Токен: {access}', status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
