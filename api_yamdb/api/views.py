@@ -14,12 +14,11 @@ from api.pagination import Pagination
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
 from .permissions import AdminOrModerator, AdminOrReadOnly, Admin
-from .serializers import (AdminUsersSerializer, CategorySerializer,
+from .serializers import (CategorySerializer,
                           CommentSerializer, GenreSerializer,
                           ReadOnlyTitleerializer, RegistrationSerializer,
                           ReviewSerializer, Titleerializer, TokenSerializer,
                           UsersChangeSerializer, UsersSerializer)
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -27,7 +26,8 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Класс для работы модели Category для операций CRUD"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [AdminOrReadOnly, ]
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          AdminOrReadOnly)
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
@@ -42,14 +42,16 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
-    permission_classes = [AdminOrReadOnly, ]
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          AdminOrReadOnly)
     pagination_class = PageNumberPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = Titleerializer
-    permission_classes = [AdminOrReadOnly, ]
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          AdminOrReadOnly)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
@@ -144,11 +146,11 @@ class TokenViewSet(APIView):
 class AdminUserView(viewsets.ModelViewSet):
     lookup_field = 'username'
     queryset = User.objects.all()
-    serializer_class = AdminUsersSerializer
+    serializer_class = UsersSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
-    permission_classes = (IsAuthenticatedOrReadOnly & Admin,)
+    permission_classes = (permissions.IsAuthenticated, Admin)
 
     @action(detail=False,
             methods=['get', 'patch'],

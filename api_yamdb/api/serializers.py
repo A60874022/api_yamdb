@@ -93,17 +93,11 @@ class ReadOnlyTitleerializer(serializers.ModelSerializer):
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        required=True,
-    )
-    email = serializers.EmailField(
-        required=True,
-    )
 
     def validate_username(self, value):
         username = value.lower()
-        if username == "me":
-            raise serializers.ValidationError("Имя me недоступно")
+        if username.lower() == 'me':
+            raise serializers.ValidationError('Имя me недоступно')
         return value
 
     class Meta:
@@ -122,31 +116,7 @@ class TokenSerializer(serializers.Serializer):
     )
 
 
-class AdminUsersSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        required=True,
-    )
-    email = serializers.EmailField(
-        required=True,
-    )
-
-    class Meta:
-        model = User
-        fields = ('username',
-                  'email',
-                  'bio',
-                  'first_name',
-                  'last_name',
-                  'role')
-
-
 class UsersSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        required=True,
-    )
-    email = serializers.EmailField(
-        required=True,
-    )
 
     class Meta:
         model = User
@@ -159,12 +129,6 @@ class UsersSerializer(serializers.ModelSerializer):
 
 
 class UsersChangeSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        required=True,
-    )
-    email = serializers.EmailField(
-        required=True,
-    )
 
     class Meta:
         model = User
