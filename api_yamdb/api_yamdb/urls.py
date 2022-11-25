@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.urls import include, path
 
-from api.views import (RegistrationViewSet, TokenViewSet,
-                       UserView)
+from api.views import (RegistrationViewSet, TokenViewSet)
 
 
 urlpatterns = [
@@ -13,6 +12,5 @@ urlpatterns = [
          name='redoc'),
     path('api/v1/auth/signup/', RegistrationViewSet.as_view()),
     path('api/v1/auth/token/', TokenViewSet.as_view(), name='token'),
-    path('api/v1/users/me/', UserView.as_view(), name='Profile'),
     path('api/v1/', include('api.urls')),
 ]

@@ -13,12 +13,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.pagination import Pagination
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
-from .permissions import AOM, GTC, IsAdminOrSuperUser
+from .permissions import AdminOrModerator, AdminOrReadOnly, Admin
 from .serializers import (AdminUsersSerializer, CategorySerializer,
                           CommentSerializer, GenreSerializer,
                           ReadOnlyTitleerializer, RegistrationSerializer,
                           ReviewSerializer, Titleerializer, TokenSerializer,
                           UsersChangeSerializer, UsersSerializer)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -26,7 +27,7 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Класс для работы модели Category для операций CRUD"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [GTC, ]
+    permission_classes = [AdminOrReadOnly, ]
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
@@ -41,14 +42,14 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
     search_fields = ('name',)
-    permission_classes = [GTC, ]
+    permission_classes = [AdminOrReadOnly, ]
     pagination_class = PageNumberPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = Titleerializer
-    permission_classes = [GTC]
+    permission_classes = [AdminOrReadOnly, ]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
@@ -66,7 +67,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     """Класс для работы модели Review для операций CRUD"""
     serializer_class = ReviewSerializer
-    permission_classes = [AOM, ]
+    permission_classes = [AdminOrModerator, ]
     pagination_class = Pagination
 
     def get_queryset(self):
@@ -82,7 +83,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Класс для работы модели Comment для операций CRUD"""
     serializer_class = CommentSerializer
-    permission_classes = [AOM, ]
+    permission_classes = [AdminOrModerator, ]
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
@@ -112,15 +113,14 @@ class RegistrationViewSet(APIView):
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            username = get_object_or_404(
-                User,
-                username=serializer.validated_data['username']
-            )
-            self.confirmation_code(username)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        username = get_object_or_404(
+            User,
+            username=serializer.validated_data['username']
+        )
+        self.confirmation_code(username)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TokenViewSet(APIView):
@@ -142,44 +142,29 @@ class TokenViewSet(APIView):
 
 
 class AdminUserView(viewsets.ModelViewSet):
-    """Класс для админки"""
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = AdminUsersSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
-    permission_classes = (IsAdminOrSuperUser,)
+    permission_classes = (IsAuthenticatedOrReadOnly & Admin,)
 
-    def post(self, request):
-        serializer = AdminUsersSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserView(APIView):
-    """Класс для настройки пользователей"""
-    queryset = User.objects.all()
-    serializer_class = UsersSerializer
-    permission_classes = [permissions.IsAuthenticated, ]
-
-    @action(detail=False, methods=['get', 'patch'], url_path='me')
-    def get(self, request):
+    @action(detail=False,
+            methods=['get', 'patch'],
+            url_path='me',
+            permission_classes=[permissions.IsAuthenticated],)
+    def profile(self, request):
         if request.method == 'GET':
             serializer = UsersSerializer(request.user)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request):
         if request.method == 'PATCH':
             serializer = UsersChangeSerializer(
                 request.user,
                 request.data,
                 partial=True
             )
-            serializer.is_valid()
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
